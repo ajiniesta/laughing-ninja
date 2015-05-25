@@ -11,43 +11,41 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.asciidoctor.Asciidoctor;
+import org.asciidoctor.Attributes;
+import org.asciidoctor.Options;
+import org.asciidoctor.OptionsBuilder;
+import org.asciidoctor.SafeMode;
 
 public class First {
 
 	@SuppressWarnings("unchecked")
 	public static void main(String[] args) throws Exception {
 		Asciidoctor asciidoctor = create();
-
-//		String html = asciidoctor.convert("Writing AsciiDoc is _easy_!", Collections.EMPTY_MAP);
-//		System.out.println(html);
-
-//		URL resource = First.class.getClassLoader().getResource("first.adoc");
-//		File file = new File("first.adoc");
-//		List<File> fileList = Arrays.asList(file);
-//		html = asciidoctor.renderFile(file, Collections.EMPTY_MAP);
-//		
-//		System.out.println(html);
+		String s = "= Hello, from One! \n"
+//				+ ":linkcss: \n"
+				+ ":stylesheet: global.css \n"
+				+ ":toc: left \n"
+				+ "Doc Writer <doc@example.com> \n"
+				+ "\n"
+				+ "An introduction to http://asciidoc.org[AsciiDoc].\n"
+				+ "\n"
+				+ "== First Section\n"
+				+ "\n"
+				+ "* item 1\n"
+				+ "* item 2";
+		Map<String, Object> options = OptionsBuilder.options()
+        .compact(true)
+        .headerFooter(true)
+        .safe(SafeMode.UNSAFE)
+        .backend("html")        
+        .asMap();
 		
-		
-//		String rendered = asciidoctor.render("*This* is it.", Collections.EMPTY_MAP);
-//		System.out.println(rendered);
-//		
-//		rendered = asciidoctor.renderFile(new File("first.adoc"), new HashMap<String, Object>());
-//		System.out.println(rendered);
-//		
-//		for (String html_chunk : result) {
-//			System.out.println(html_chunk);
-//		}
-		
-		FileReader reader = new FileReader(new File("first.adoc"));
-		StringWriter writer = new StringWriter();
+		String html = asciidoctor.convert(s, options);
+		System.out.println(html);
 
-		asciidoctor.convert(reader, writer, Collections.EMPTY_MAP);
-
-		StringBuffer htmlBuffer = writer.getBuffer();
-		System.out.println(htmlBuffer.toString());
 	}
 
 }

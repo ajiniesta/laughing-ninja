@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +16,8 @@ import java.util.Map;
 import org.asciidoctor.AsciiDocDirectoryWalker;
 import org.asciidoctor.Asciidoctor;
 import org.asciidoctor.DirectoryWalker;
+import org.asciidoctor.OptionsBuilder;
+import org.asciidoctor.SafeMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
@@ -50,6 +53,8 @@ public class NinjaController {
 	@RequestMapping("/{id}")
 	@ResponseBody
 	String processPage(@PathVariable("id") String id) throws Exception{
+//	String processPage() throws Exception{
+//		String id = "one";
 		logger.info("ID:" + id);
 		long t1 = System.currentTimeMillis();
 		String html = "";
@@ -58,7 +63,15 @@ public class NinjaController {
 		FileReader reader = new FileReader(new File(file));
 		StringWriter writer = new StringWriter();
 
-		asciidoctor.convert(reader, writer, Collections.<String, Object> emptyMap());
+		Map<String, Object> options = OptionsBuilder.options()
+		        .compact(true)
+		        .headerFooter(true)	
+		        .safe(SafeMode.UNSAFE)
+		        .backend("html")        
+		        .asMap();
+
+		
+		asciidoctor.convert(reader, writer, options);
 
 		StringBuffer htmlBuffer = writer.getBuffer();
 		
@@ -67,11 +80,59 @@ public class NinjaController {
 		long time = System.currentTimeMillis() - t1;
 		logger.info("Time in converting one small file: {} ms", time);
 
-		Map<String, Object> bindings = new HashMap<String, Object>();
-		bindings.putAll(defaultBindings);
-		bindings.put("adoc", html);
-		html = dt.process(bindings);
+//		Map<String, Object> bindings = new HashMap<String, Object>();
+//		bindings.putAll(defaultBindings);
+//		bindings.put("adoc", html);
+//		html = dt.process(bindings);
 		
+		return html;
+	}
+
+	@RequestMapping("/test")
+	@ResponseBody
+//	String processPage(@PathVariable("id") String id) throws Exception{
+	String processPageTest() throws Exception{
+		String id = "one";
+		logger.info("ID:" + id);
+		long t1 = System.currentTimeMillis();
+		String html = "";
+//		String resourceName = "adoc/"+id+".adoc";
+//		String file = getClass().getClassLoader().getResource(resourceName).getFile();
+//		FileReader reader = new FileReader(new File(file));
+		String s = "= Hello, from One! \n"
+				+ ":toc: left \n"
+				+ "Doc Writer <doc@example.com> \n"
+				+ "\n"
+				+ "An introduction to http://asciidoc.org[AsciiDoc].\n"
+				+ "\n"
+				+ "== First Section\n"
+				+ "\n"
+				+ "* item 1\n"
+				+ "* item 2";
+		StringReader reader = new StringReader(s);
+		StringWriter writer = new StringWriter();
+
+		Map<String, Object> options = OptionsBuilder.options()
+		        .compact(true)
+		        .headerFooter(true)	
+		        .safe(SafeMode.UNSAFE)
+		        .backend("html")        
+		        .asMap();
+		
+		asciidoctor.convert(reader, writer, options);
+
+		StringBuffer htmlBuffer = writer.getBuffer();
+		
+		html = htmlBuffer.toString();
+		
+		long time = System.currentTimeMillis() - t1;
+		logger.info("Time in converting one small file: {} ms", time);
+
+//		Map<String, Object> bindings = new HashMap<String, Object>();
+//		bindings.putAll(defaultBindings);
+//		bindings.put("adoc", html);
+//		html = dt.process(bindings);
+//		
 		return html;
 	}
 	
